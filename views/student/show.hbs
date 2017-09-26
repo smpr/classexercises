@@ -1,5 +1,11 @@
 <div>
     <div>Name: {{student.name}}</div>
     <div>Age: {{student.age}}</div>
+
+    <a href="/students/{{student.id}}/edit">EDIT!</a><br>
+    <form action="/students/{{student._id}}?_method=DELETE" method="POST">
+    <a href="/students/{{student._id}}/delete">Delete</a>
+    <input type="submit" value="Delete"></form>
     <a href="/students">Back to All Students</a>
+    
 </div>

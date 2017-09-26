@@ -22,9 +22,7 @@ router.get('/', (request, response) => {
         })
 
 });
-router.get('/new', (request,response)=>{
-    response.render('student/new')
-})
+
 
 // NEW route
 router.get('/new', (request, response) => {
@@ -86,19 +84,40 @@ router.get('/:id/edit', (request, response) => {
 
 })
 
-// DELETE route
-router.get('/:id/delete', (request, response) => {
-
+// DELETE route with a link
+router.delete('/:id/delete', (request, response) => {
+    //grab the student id from the parameters
+    //for the single student we are grabbing
     const studentId = request.params.id
-
-    StudentModel.findOneAndRemove(studentId)
+    //use the studentModel to find the student document
+    //by id that you want to delete then delete it
+    StudentModel.findByIdAndRemove(studentId)
         .then((student) => {
-            response.send('You deleted it!')
+            //then redirect back to the students index
+            //to show all students
+            response.redirect('/students')
         })
         .catch((error) => {
             console.log(error)
         })
 })
+//delete using a button!
+router.delete('/:id', (request, response) => {
+     //grab the student id from the parameters
+    //for the single student we are grabbing
+        const studentId = request.params.id
+     //use the studentModel to find the student document
+    //by id that you want to delete then delete it
+        StudentModel.findByIdAndRemove(studentId)
+            .then((student) => {
+                    //then redirect back to the students index
+            //to show all students
+                response.redirect('/students')
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    })
 
 // CREATE route
 router.post('/', (request, response) => {
