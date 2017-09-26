@@ -16,6 +16,9 @@ router.get('/', (request, response) => {
         })
         
 });
+router.get('/new', (request,response)=>{
+    response.render('student/new')
+})
 
 router.get('/:id', (request, response) => {
     const studentId = request.params.id
@@ -28,7 +31,14 @@ router.get('/:id', (request, response) => {
         })
 
 })
-
+router.get('/:id/edit', (request,response)=>{
+    const studentId = request.params.id
+    StudentModel.findById(studentId)
+    .then(()=>{
+        response.render('student/edit')
+        student: student
+    }
+)})
 router.get('/:id/delete', (request, response) => {
 
     const studentId = request.params.id
@@ -38,6 +48,21 @@ router.get('/:id/delete', (request, response) => {
             response.send('You deleted it!')
         })
 
+})
+//CREATE ROUTE PART 2 - THIS IS WHAT MAKES NEW INFORMATION SAVE
+router.post("/", (request, response) => {
+    //request.body refers to what was in form but turned into a JS object bc we used body parser
+    const newStudent = request.body;
+    //saves what came through form and creates new student with data from that js object
+    //you use whole "student" object we created and pass as parameter for .create
+    //you can use (newStudent) in next line instead of ({name: newStudent.name, age: newStudent.age}). body parser created the newStudent object for us. truthfully you could use (request.body) instead of (newStudent)
+    StudentModel.create(newStudent)
+        .then(() => {
+            response.redirect("/students")
+        })
+        .catch((error) => {
+            console.log(error)
+        })
 })
 
 module.exports = router
