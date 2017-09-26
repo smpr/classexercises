@@ -8,8 +8,14 @@ const app = express()
 mongoose.connect('mongodb://localhost/students');
 
 app.set('view engine', 'hbs')
- app.use(bodyParser.urlencoded({extended:true}))
- app.use(methodOverride('_method'))
+
+app.use(bodyParser.urlencoded({extended: true}))
+app.use(methodOverride('_method'))
+
+app.get('/', (request, response) => {
+    response.redirect('/students')
+})
+
 const db = mongoose.connection
 
 // Will log an error if db can't connect to MongoDB

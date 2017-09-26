@@ -4,9 +4,15 @@ const Schema = require("../db/schema.js");
 
 const StudentModel = Schema.StudentModel;
 
+// INDEX route
 router.get('/', (request, response) => {
+
+    // Find ALL of the students from the DB
     StudentModel.find({})
         .then((students) => {
+
+            // THEN once we're done finding the students in the DB
+            // use Handlebars to create a <div> for each student 
             response.render('student/index', {
                 students: students
             })
@@ -14,31 +20,73 @@ router.get('/', (request, response) => {
         .catch((error) => {
             console.log(error)
         })
-        
+
 });
 router.get('/new', (request,response)=>{
     response.render('student/new')
 })
 
+// NEW route
+router.get('/new', (request, response) => {
+
+    // Display an empty form containing inputs for each student
+    // attribute from our Schema
+    response.render('student/new')
+})
+
+
+// SHOW route
 router.get('/:id', (request, response) => {
+
+    // Grab the ID from params
     const studentId = request.params.id
 
+    // Find the student by ID from the database
     StudentModel.findById(studentId)
         .then((student) => {
+
+            // THEN once the database has returned the single student's info
+            // use Handlebars to create a <div> for the single student
             response.render('student/show', {
                 student: student
             })
         })
+        .catch((error) => {
+            console.log(error)
+        })
 
 })
-router.get('/:id/edit', (request,response)=>{
+
+// EDIT route
+router.get('/:id/edit', (request, response) => {
+
+    // get the student ID from params
     const studentId = request.params.id
+
+    // find the student from the DB using the ID
     StudentModel.findById(studentId)
-    .then(()=>{
-        response.render('student/edit')
-        students: students
-    }
-)})
+        .then((student) => {
+
+            // THEN once the student has been returned from the DB
+            // use Handlebars to show a form pre-populated with the
+            // info from the single student we are trying to edit
+
+            // BE SURE to use Method Override to let the form submit 
+            // a PUT request (instead of the default POST) to 
+            // '/students/THE_STUDENT_ID' where THE_STUDENT_ID 
+            // is the ID of the single student we are trying to update
+            // (use student._id)
+            response.render('student/edit', {
+                student: student
+            })
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+
+})
+
+// DELETE route
 router.get('/:id/delete', (request, response) => {
 
     const studentId = request.params.id
@@ -47,29 +95,60 @@ router.get('/:id/delete', (request, response) => {
         .then((student) => {
             response.send('You deleted it!')
         })
-
+        .catch((error) => {
+            console.log(error)
+        })
 })
-//CREATE ROUTE PART 2 - THIS IS WHAT MAKES NEW INFORMATION SAVE
-router.post("/", (request, response) => {
-    //request.body refers to what was in form but turned into a JS object bc we used body parser
-    const newStudent = request.body;
-    //saves what came through form and creates new student with data from that js object
-    //you use whole "student" object we created and pass as parameter for .create
-    //you can use (newStudent) in next line instead of ({name: newStudent.name, age: newStudent.age}). body parser created the newStudent object for us. truthfully you could use (request.body) instead of (newStudent)
+
+// CREATE route
+router.post('/', (request, response) => {
+
+    // Grab the information the user entered in the form
+    // by capturing the request body
+    // NOTE: we need to have set up `body-parser` to give
+    //       us this request body in a nice Javascript format
+    const newStudent = request.body
+
+    // Create a new student in the Database using the StudentModel
     StudentModel.create(newStudent)
         .then(() => {
-            response.redirect("/students")
+            // THEN once the student has been saved in the database
+            // redirect to the Students INDEX so that we can view
+            // all students, INCLUDING the new one that we've created
+            response.redirect('/students')
         })
         .catch((error) => {
             console.log(error)
         })
 })
-router.put('/:id', (request,response)=>{
-    const studentIdToUpdate = request.params.Id
+
+// UPDATE route
+router.put('/:id', (request, response) => {
+
+    // Get the student ID to identify which single student to update
+    const studentIdToUpdate = request.params.id
+
+    // Get all information from the form (just like on the POST route), 
+    // including any updated information for the single student
     const updatedStudent = request.body
-    StudentModel.findByIdAndUpdate(studentIdToUpdate, updatedStudent,{new:true})
-    .then(()=>{
-        response.redirect('/students/${studentIdToUpdate}')
-    })
+
+    // Use the StudentModel to find the student in the database 
+    // and update any changed information
+    // PARAMETERS:
+    // first param = student ID to update
+    // second param = student information as an object, including any updates
+    // third param = boilerplate (always pass this)
+    StudentModel.findByIdAndUpdate(studentIdToUpdate, updatedStudent, { new: true })
+        .then(() => {
+
+            // THEN once the single student has been successfully updated
+            // in the database, REDIRECT to the single student's SHOW page
+            response.redirect(`/students/${studentIdToUpdate}`)
+        })
+        .catch((error) => {
+            console.log(error)
+        })
 })
+
+
 module.exports = router
