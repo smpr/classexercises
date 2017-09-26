@@ -36,7 +36,7 @@ router.get('/:id/edit', (request,response)=>{
     StudentModel.findById(studentId)
     .then(()=>{
         response.render('student/edit')
-        student: student
+        students: students
     }
 )})
 router.get('/:id/delete', (request, response) => {
@@ -64,5 +64,12 @@ router.post("/", (request, response) => {
             console.log(error)
         })
 })
-
+router.put('/:id', (request,response)=>{
+    const studentIdToUpdate = request.params.Id
+    const updatedStudent = request.body
+    StudentModel.findByIdAndUpdate(studentIdToUpdate, updatedStudent,{new:true})
+    .then(()=>{
+        response.redirect('/students/${studentIdToUpdate}')
+    })
+})
 module.exports = router
